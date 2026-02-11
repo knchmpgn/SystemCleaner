@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Principal;
+using System.Threading.Tasks;
 using System.Windows;
 using SystemCleaner.Helpers;
 using SystemCleaner.Models;
@@ -16,6 +16,8 @@ namespace SystemCleaner
     public partial class MainWindow : Window
     {
         private readonly CleanerSettings _settings;
+        private int _totalTasks;
+        private int _completedTasks;
 
         public MainWindow()
         {
@@ -32,132 +34,120 @@ namespace SystemCleaner
 
         private void ApplySettingsToUi()
         {
-            // Storage
+            // Quick Cleanup
             JunkFilesCheckBox.IsChecked = _settings.RemoveJunkFiles;
             SystemTempCheckBox.IsChecked = _settings.CleanSystemTemporaryFiles;
             RecycleBinCheckBox.IsChecked = _settings.EmptyRecycleBin;
-            DiagnosticsCheckBox.IsChecked = _settings.RemoveDiagnosticsAndErrorReports;
-            VisualCacheCheckBox.IsChecked = _settings.ClearVisualCache;
-
-            // History and Privacy
-            FileHistoryCheckBox.IsChecked = _settings.ClearFileHistory;
             BrowserDataCheckBox.IsChecked = _settings.WipeBrowserData;
+            FileHistoryCheckBox.IsChecked = _settings.ClearFileHistory;
+
+            // Privacy & Tracking
             WindowsDefenderCheckBox.IsChecked = _settings.RemoveWindowsDefenderHistory;
+            ClearUserAssistDataCheckBox.IsChecked = _settings.ClearUserAssistData;
+            ClearTypedPathsCheckBox.IsChecked = _settings.ClearTypedPaths;
+            ClearRecentAppsCheckBox.IsChecked = _settings.ClearRecentApps;
+            ClearClipboardHistoryCheckBox.IsChecked = _settings.ClearClipboardHistory;
+            ClearMRUListsCheckBox.IsChecked = _settings.ClearMRULists;
 
-            // System
-            RegistryCleanupCheckBox.IsChecked = _settings.CleanRegistry;
-            ComponentStoreCheckBox.IsChecked = _settings.CleanComponentStore;
-
-            // Clutter
-            EmptyDirsCheckBox.IsChecked = _settings.RemoveEmptyDirectories;
-            BrokenShortcutsCheckBox.IsChecked = _settings.RemoveBrokenShortcuts;
-
-            // Windows System Cache
+            // System Maintenance
+            VisualCacheCheckBox.IsChecked = _settings.ClearVisualCache;
             ClearFontCacheCheckBox.IsChecked = _settings.ClearFontCache;
             ClearWindowsStoreCacheCheckBox.IsChecked = _settings.ClearWindowsStoreCache;
+            ComponentStoreCheckBox.IsChecked = _settings.CleanComponentStore;
             CleanWindowsUpdateCheckBox.IsChecked = _settings.CleanWindowsUpdate;
-            ClearNetworkLocationCacheCheckBox.IsChecked = _settings.ClearNetworkLocationCache;
-            ClearBITSQueueCheckBox.IsChecked = _settings.ClearBITSQueue;
-            ClearCBSLogsCheckBox.IsChecked = _settings.ClearCBSLogs;
 
-            // Event & Diagnostic Logs
+            // Logs & Diagnostics
+            DiagnosticsCheckBox.IsChecked = _settings.RemoveDiagnosticsAndErrorReports;
             ClearEventLogsCheckBox.IsChecked = _settings.ClearEventLogs;
             ClearWindowsSetupLogsCheckBox.IsChecked = _settings.ClearWindowsSetupLogs;
             ClearCrashDumpsCheckBox.IsChecked = _settings.ClearCrashDumps;
             ClearPerformanceMonitorDataCheckBox.IsChecked = _settings.ClearPerformanceMonitorData;
+            ClearCBSLogsCheckBox.IsChecked = _settings.ClearCBSLogs;
 
-            // User Profile Cleanup
-            ClearClipboardHistoryCheckBox.IsChecked = _settings.ClearClipboardHistory;
-            RebuildSearchIndexCheckBox.IsChecked = _settings.RebuildSearchIndex;
-            ClearUserAssistDataCheckBox.IsChecked = _settings.ClearUserAssistData;
-            ClearTypedPathsCheckBox.IsChecked = _settings.ClearTypedPaths;
-            ClearMUICacheCheckBox.IsChecked = _settings.ClearMUICache;
-            ClearRecentAppsCheckBox.IsChecked = _settings.ClearRecentApps;
-
-            // Network Cache
+            // Network
             FlushDNSCacheCheckBox.IsChecked = _settings.FlushDNSCache;
             ClearNetBIOSCacheCheckBox.IsChecked = _settings.ClearNetBIOSCache;
             ClearARPCacheCheckBox.IsChecked = _settings.ClearARPCache;
             ClearWindowsNetworkingCacheCheckBox.IsChecked = _settings.ClearWindowsNetworkingCache;
+            ClearNetworkLocationCacheCheckBox.IsChecked = _settings.ClearNetworkLocationCache;
+            ClearBITSQueueCheckBox.IsChecked = _settings.ClearBITSQueue;
 
-            // Large System Files
+            // Registry
+            RegistryCleanupCheckBox.IsChecked = _settings.CleanRegistry;
+            CleanFileExtensionAssociationsCheckBox.IsChecked = _settings.CleanFileExtensionAssociations;
+            CleanUninstallEntriesCheckBox.IsChecked = _settings.CleanUninstallEntries;
+            CleanSharedDLLsCheckBox.IsChecked = _settings.CleanSharedDLLs;
+            CleanCOMRegistrationsCheckBox.IsChecked = _settings.CleanCOMRegistrations;
+            ClearMUICacheCheckBox.IsChecked = _settings.ClearMUICache;
+
+            // Advanced
+            EmptyDirsCheckBox.IsChecked = _settings.RemoveEmptyDirectories;
+            BrokenShortcutsCheckBox.IsChecked = _settings.RemoveBrokenShortcuts;
             RemoveWindowsOldCheckBox.IsChecked = _settings.RemoveWindowsOld;
             CleanDriverStoreCheckBox.IsChecked = _settings.CleanDriverStore;
             CleanWindowsInstallerCacheCheckBox.IsChecked = _settings.CleanWindowsInstallerCache;
             DisableHibernationCheckBox.IsChecked = _settings.DisableHibernation;
             CleanSystemRestorePointsCheckBox.IsChecked = _settings.CleanSystemRestorePoints;
-
-            // Registry Optimization
-            ClearMRUListsCheckBox.IsChecked = _settings.ClearMRULists;
-            CleanFileExtensionAssociationsCheckBox.IsChecked = _settings.CleanFileExtensionAssociations;
-            CleanUninstallEntriesCheckBox.IsChecked = _settings.CleanUninstallEntries;
-            CleanSharedDLLsCheckBox.IsChecked = _settings.CleanSharedDLLs;
-            CleanCOMRegistrationsCheckBox.IsChecked = _settings.CleanCOMRegistrations;
+            RebuildSearchIndexCheckBox.IsChecked = _settings.RebuildSearchIndex;
         }
 
         private void PersistSettings()
         {
-            // Storage
+            // Quick Cleanup
             _settings.RemoveJunkFiles = JunkFilesCheckBox.IsChecked ?? false;
             _settings.CleanSystemTemporaryFiles = SystemTempCheckBox.IsChecked ?? false;
             _settings.EmptyRecycleBin = RecycleBinCheckBox.IsChecked ?? false;
-            _settings.RemoveDiagnosticsAndErrorReports = DiagnosticsCheckBox.IsChecked ?? false;
-            _settings.ClearVisualCache = VisualCacheCheckBox.IsChecked ?? false;
-
-            // History and Privacy
-            _settings.ClearFileHistory = FileHistoryCheckBox.IsChecked ?? false;
             _settings.WipeBrowserData = BrowserDataCheckBox.IsChecked ?? false;
+            _settings.ClearFileHistory = FileHistoryCheckBox.IsChecked ?? false;
+
+            // Privacy & Tracking
             _settings.RemoveWindowsDefenderHistory = WindowsDefenderCheckBox.IsChecked ?? false;
+            _settings.ClearUserAssistData = ClearUserAssistDataCheckBox.IsChecked ?? false;
+            _settings.ClearTypedPaths = ClearTypedPathsCheckBox.IsChecked ?? false;
+            _settings.ClearRecentApps = ClearRecentAppsCheckBox.IsChecked ?? false;
+            _settings.ClearClipboardHistory = ClearClipboardHistoryCheckBox.IsChecked ?? false;
+            _settings.ClearMRULists = ClearMRUListsCheckBox.IsChecked ?? false;
 
-            // System
-            _settings.CleanRegistry = RegistryCleanupCheckBox.IsChecked ?? false;
-            _settings.CleanComponentStore = ComponentStoreCheckBox.IsChecked ?? false;
-
-            // Clutter
-            _settings.RemoveEmptyDirectories = EmptyDirsCheckBox.IsChecked ?? false;
-            _settings.RemoveBrokenShortcuts = BrokenShortcutsCheckBox.IsChecked ?? false;
-
-            // Windows System Cache
+            // System Maintenance
+            _settings.ClearVisualCache = VisualCacheCheckBox.IsChecked ?? false;
             _settings.ClearFontCache = ClearFontCacheCheckBox.IsChecked ?? false;
             _settings.ClearWindowsStoreCache = ClearWindowsStoreCacheCheckBox.IsChecked ?? false;
+            _settings.CleanComponentStore = ComponentStoreCheckBox.IsChecked ?? false;
             _settings.CleanWindowsUpdate = CleanWindowsUpdateCheckBox.IsChecked ?? false;
-            _settings.ClearNetworkLocationCache = ClearNetworkLocationCacheCheckBox.IsChecked ?? false;
-            _settings.ClearBITSQueue = ClearBITSQueueCheckBox.IsChecked ?? false;
-            _settings.ClearCBSLogs = ClearCBSLogsCheckBox.IsChecked ?? false;
 
-            // Event & Diagnostic Logs
+            // Logs & Diagnostics
+            _settings.RemoveDiagnosticsAndErrorReports = DiagnosticsCheckBox.IsChecked ?? false;
             _settings.ClearEventLogs = ClearEventLogsCheckBox.IsChecked ?? false;
             _settings.ClearWindowsSetupLogs = ClearWindowsSetupLogsCheckBox.IsChecked ?? false;
             _settings.ClearCrashDumps = ClearCrashDumpsCheckBox.IsChecked ?? false;
             _settings.ClearPerformanceMonitorData = ClearPerformanceMonitorDataCheckBox.IsChecked ?? false;
+            _settings.ClearCBSLogs = ClearCBSLogsCheckBox.IsChecked ?? false;
 
-            // User Profile Cleanup
-            _settings.ClearClipboardHistory = ClearClipboardHistoryCheckBox.IsChecked ?? false;
-            _settings.RebuildSearchIndex = RebuildSearchIndexCheckBox.IsChecked ?? false;
-            _settings.ClearUserAssistData = ClearUserAssistDataCheckBox.IsChecked ?? false;
-            _settings.ClearTypedPaths = ClearTypedPathsCheckBox.IsChecked ?? false;
-            _settings.ClearMUICache = ClearMUICacheCheckBox.IsChecked ?? false;
-            _settings.ClearRecentApps = ClearRecentAppsCheckBox.IsChecked ?? false;
-
-            // Network Cache
+            // Network
             _settings.FlushDNSCache = FlushDNSCacheCheckBox.IsChecked ?? false;
             _settings.ClearNetBIOSCache = ClearNetBIOSCacheCheckBox.IsChecked ?? false;
             _settings.ClearARPCache = ClearARPCacheCheckBox.IsChecked ?? false;
             _settings.ClearWindowsNetworkingCache = ClearWindowsNetworkingCacheCheckBox.IsChecked ?? false;
+            _settings.ClearNetworkLocationCache = ClearNetworkLocationCacheCheckBox.IsChecked ?? false;
+            _settings.ClearBITSQueue = ClearBITSQueueCheckBox.IsChecked ?? false;
 
-            // Large System Files
+            // Registry
+            _settings.CleanRegistry = RegistryCleanupCheckBox.IsChecked ?? false;
+            _settings.CleanFileExtensionAssociations = CleanFileExtensionAssociationsCheckBox.IsChecked ?? false;
+            _settings.CleanUninstallEntries = CleanUninstallEntriesCheckBox.IsChecked ?? false;
+            _settings.CleanSharedDLLs = CleanSharedDLLsCheckBox.IsChecked ?? false;
+            _settings.CleanCOMRegistrations = CleanCOMRegistrationsCheckBox.IsChecked ?? false;
+            _settings.ClearMUICache = ClearMUICacheCheckBox.IsChecked ?? false;
+
+            // Advanced
+            _settings.RemoveEmptyDirectories = EmptyDirsCheckBox.IsChecked ?? false;
+            _settings.RemoveBrokenShortcuts = BrokenShortcutsCheckBox.IsChecked ?? false;
             _settings.RemoveWindowsOld = RemoveWindowsOldCheckBox.IsChecked ?? false;
             _settings.CleanDriverStore = CleanDriverStoreCheckBox.IsChecked ?? false;
             _settings.CleanWindowsInstallerCache = CleanWindowsInstallerCacheCheckBox.IsChecked ?? false;
             _settings.DisableHibernation = DisableHibernationCheckBox.IsChecked ?? false;
             _settings.CleanSystemRestorePoints = CleanSystemRestorePointsCheckBox.IsChecked ?? false;
-
-            // Registry Optimization
-            _settings.ClearMRULists = ClearMRUListsCheckBox.IsChecked ?? false;
-            _settings.CleanFileExtensionAssociations = CleanFileExtensionAssociationsCheckBox.IsChecked ?? false;
-            _settings.CleanUninstallEntries = CleanUninstallEntriesCheckBox.IsChecked ?? false;
-            _settings.CleanSharedDLLs = CleanSharedDLLsCheckBox.IsChecked ?? false;
-            _settings.CleanCOMRegistrations = CleanCOMRegistrationsCheckBox.IsChecked ?? false;
+            _settings.RebuildSearchIndex = RebuildSearchIndexCheckBox.IsChecked ?? false;
 
             _settings.Save();
         }
@@ -170,27 +160,11 @@ namespace SystemCleaner
 
             if (!hasSelection)
             {
-                MessageBox.Show("Select at least one cleanup option.", "Clean", MessageBoxButton.OK, MessageBoxImage.Information);
+                CustomDialog.Show("Select at least one cleanup option.", "Clean", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            bool needsElevation = NeedsElevation();
-            if (needsElevation && !IsRunningAsAdmin())
-            {
-                var elevate = MessageBox.Show(
-                    "Many selected operations require administrator rights to complete fully. Restart with elevation?",
-                    "Administrator required",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-                if (elevate == MessageBoxResult.Yes)
-                {
-                    RestartElevated();
-                    Close();
-                    return;
-                }
-            }
-
-            var confirmation = MessageBox.Show(
+            var confirmation = CustomDialog.Show(
                 "The selected operations will modify files, caches, and/or the registry. Changes cannot be undone.\n\nContinue?",
                 "Confirm cleaning",
                 MessageBoxButton.YesNo,
@@ -199,6 +173,7 @@ namespace SystemCleaner
                 return;
 
             DisableActionButtons(true);
+            ShowProgress(true);
 
             try
             {
@@ -208,235 +183,231 @@ namespace SystemCleaner
                 long freeBefore = new DriveInfo(systemDrive).AvailableFreeSpace;
 
                 var tasks = new List<string>();
+                _totalTasks = CountSelectedTasks();
+                _completedTasks = 0;
 
-                // Storage
+                // Quick Cleanup
                 if (JunkFilesCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.RemoveJunkFilesAsync();
+                    await RunTaskWithProgress("Removing user temp files...", CleanerOperations.RemoveJunkFilesAsync());
                     tasks.Add("User temp files");
                 }
                 if (SystemTempCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.CleanSystemTemporaryFilesAsync();
+                    await RunTaskWithProgress("Cleaning system temp/update caches...", CleanerOperations.CleanSystemTemporaryFilesAsync());
                     tasks.Add("System temp/update caches");
                 }
                 if (RecycleBinCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.EmptyRecycleBinAsync();
+                    await RunTaskWithProgress("Emptying recycle bin...", CleanerOperations.EmptyRecycleBinAsync());
                     tasks.Add("Recycle bin");
-                }
-                if (DiagnosticsCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.RemoveDiagnosticsAndErrorReportsAsync();
-                    tasks.Add("Diagnostics/error reports");
-                }
-                if (VisualCacheCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearVisualCacheAsync();
-                    tasks.Add("Icon/thumbnail cache");
-                }
-
-                // History and Privacy
-                if (FileHistoryCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearFileHistoryAsync();
-                    tasks.Add("Explorer history");
                 }
                 if (BrowserDataCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.WipeBrowserDataAsync();
+                    await RunTaskWithProgress("Wiping browser data...", CleanerOperations.WipeBrowserDataAsync());
                     tasks.Add("Browser data");
                 }
+                if (FileHistoryCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing Explorer history...", CleanerOperations.ClearFileHistoryAsync());
+                    tasks.Add("Explorer history");
+                }
+
+                // Privacy & Tracking
                 if (WindowsDefenderCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.ClearWindowsDefenderHistoryAsync();
+                    await RunTaskWithProgress("Clearing Defender history...", CleanerOperations.ClearWindowsDefenderHistoryAsync());
                     tasks.Add("Defender history");
-                }
-
-                // System
-                if (RegistryCleanupCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.CleanRegistryAsync();
-                    tasks.Add("Registry run entries");
-                }
-                if (ComponentStoreCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.CleanComponentStoreAsync();
-                    tasks.Add("Component store");
-                }
-
-                // Clutter
-                if (EmptyDirsCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.RemoveEmptyDirectoriesAsync();
-                    tasks.Add("Empty directories");
-                }
-                if (BrokenShortcutsCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.RemoveBrokenShortcutsAsync();
-                    tasks.Add("Broken shortcuts");
-                }
-
-                // Windows System Cache
-                if (ClearFontCacheCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearFontCacheAsync();
-                    tasks.Add("Font cache");
-                }
-                if (ClearWindowsStoreCacheCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearWindowsStoreCacheAsync();
-                    tasks.Add("Store cache");
-                }
-                if (CleanWindowsUpdateCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.CleanWindowsUpdateAsync();
-                    tasks.Add("Windows Update");
-                }
-                if (ClearNetworkLocationCacheCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearNetworkLocationCacheAsync();
-                    tasks.Add("Network location cache");
-                }
-                if (ClearBITSQueueCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearBITSQueueAsync();
-                    tasks.Add("BITS queue");
-                }
-                if (ClearCBSLogsCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearCBSLogsAsync();
-                    tasks.Add("CBS logs");
-                }
-
-                // Event & Diagnostic Logs
-                if (ClearEventLogsCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearEventLogsAsync();
-                    tasks.Add("Event logs");
-                }
-                if (ClearWindowsSetupLogsCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearWindowsSetupLogsAsync();
-                    tasks.Add("Setup logs");
-                }
-                if (ClearCrashDumpsCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearCrashDumpsAsync();
-                    tasks.Add("Crash dumps");
-                }
-                if (ClearPerformanceMonitorDataCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearPerformanceMonitorDataAsync();
-                    tasks.Add("Performance data");
-                }
-
-                // User Profile Cleanup
-                if (ClearClipboardHistoryCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearClipboardHistoryAsync();
-                    tasks.Add("Clipboard history");
-                }
-                if (RebuildSearchIndexCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.RebuildSearchIndexAsync();
-                    tasks.Add("Search index");
                 }
                 if (ClearUserAssistDataCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.ClearUserAssistDataAsync();
+                    await RunTaskWithProgress("Clearing UserAssist data...", CleanerOperations.ClearUserAssistDataAsync());
                     tasks.Add("UserAssist data");
                 }
                 if (ClearTypedPathsCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.ClearTypedPathsAsync();
+                    await RunTaskWithProgress("Clearing typed paths...", CleanerOperations.ClearTypedPathsAsync());
                     tasks.Add("Typed paths");
-                }
-                if (ClearMUICacheCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.ClearMUICacheAsync();
-                    tasks.Add("MUI cache");
                 }
                 if (ClearRecentAppsCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.ClearRecentAppsAsync();
+                    await RunTaskWithProgress("Clearing recent apps...", CleanerOperations.ClearRecentAppsAsync());
                     tasks.Add("Recent apps");
                 }
+                if (ClearClipboardHistoryCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing clipboard history...", CleanerOperations.ClearClipboardHistoryAsync());
+                    tasks.Add("Clipboard history");
+                }
+                if (ClearMRUListsCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing MRU lists...", CleanerOperations.ClearMRUListsAsync());
+                    tasks.Add("MRU lists");
+                }
 
-                // Network Cache
+                // System Maintenance
+                if (VisualCacheCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing icon/thumbnail cache...", CleanerOperations.ClearVisualCacheAsync());
+                    tasks.Add("Icon/thumbnail cache");
+                }
+                if (ClearFontCacheCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing font cache...", CleanerOperations.ClearFontCacheAsync());
+                    tasks.Add("Font cache");
+                }
+                if (ClearWindowsStoreCacheCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing Store cache...", CleanerOperations.ClearWindowsStoreCacheAsync());
+                    tasks.Add("Store cache");
+                }
+                if (ComponentStoreCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Cleaning component store...", CleanerOperations.CleanComponentStoreAsync());
+                    tasks.Add("Component store");
+                }
+                if (CleanWindowsUpdateCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Cleaning Windows Update...", CleanerOperations.CleanWindowsUpdateAsync());
+                    tasks.Add("Windows Update");
+                }
+
+                // Logs & Diagnostics
+                if (DiagnosticsCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Removing diagnostics/error reports...", CleanerOperations.RemoveDiagnosticsAndErrorReportsAsync());
+                    tasks.Add("Diagnostics/error reports");
+                }
+                if (ClearEventLogsCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing event logs...", CleanerOperations.ClearEventLogsAsync());
+                    tasks.Add("Event logs");
+                }
+                if (ClearWindowsSetupLogsCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing setup logs...", CleanerOperations.ClearWindowsSetupLogsAsync());
+                    tasks.Add("Setup logs");
+                }
+                if (ClearCrashDumpsCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing crash dumps...", CleanerOperations.ClearCrashDumpsAsync());
+                    tasks.Add("Crash dumps");
+                }
+                if (ClearPerformanceMonitorDataCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing performance data...", CleanerOperations.ClearPerformanceMonitorDataAsync());
+                    tasks.Add("Performance data");
+                }
+                if (ClearCBSLogsCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing CBS logs...", CleanerOperations.ClearCBSLogsAsync());
+                    tasks.Add("CBS logs");
+                }
+
+                // Network
                 if (FlushDNSCacheCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.FlushDNSCacheAsync();
+                    await RunTaskWithProgress("Flushing DNS cache...", CleanerOperations.FlushDNSCacheAsync());
                     tasks.Add("DNS cache");
                 }
                 if (ClearNetBIOSCacheCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.ClearNetBIOSCacheAsync();
+                    await RunTaskWithProgress("Clearing NetBIOS cache...", CleanerOperations.ClearNetBIOSCacheAsync());
                     tasks.Add("NetBIOS cache");
                 }
                 if (ClearARPCacheCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.ClearARPCacheAsync();
+                    await RunTaskWithProgress("Clearing ARP cache...", CleanerOperations.ClearARPCacheAsync());
                     tasks.Add("ARP cache");
                 }
                 if (ClearWindowsNetworkingCacheCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.ClearWindowsNetworkingCacheAsync();
+                    await RunTaskWithProgress("Clearing network cache...", CleanerOperations.ClearWindowsNetworkingCacheAsync());
                     tasks.Add("Network cache");
                 }
-
-                // Large System Files
-                if (RemoveWindowsOldCheckBox.IsChecked == true)
+                if (ClearNetworkLocationCacheCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.RemoveWindowsOldAsync();
-                    tasks.Add("Windows.old");
+                    await RunTaskWithProgress("Clearing network location cache...", CleanerOperations.ClearNetworkLocationCacheAsync());
+                    tasks.Add("Network location cache");
                 }
-                if (CleanDriverStoreCheckBox.IsChecked == true)
+                if (ClearBITSQueueCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.CleanDriverStoreAsync();
-                    tasks.Add("Driver store");
-                }
-                if (CleanWindowsInstallerCacheCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.CleanWindowsInstallerCacheAsync();
-                    tasks.Add("Installer cache");
-                }
-                if (DisableHibernationCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.DisableHibernationAsync();
-                    tasks.Add("Hibernation");
-                }
-                if (CleanSystemRestorePointsCheckBox.IsChecked == true)
-                {
-                    await CleanerOperations.CleanSystemRestorePointsAsync();
-                    tasks.Add("Restore points");
+                    await RunTaskWithProgress("Clearing BITS queue...", CleanerOperations.ClearBITSQueueAsync());
+                    tasks.Add("BITS queue");
                 }
 
-                // Registry Optimization
-                if (ClearMRUListsCheckBox.IsChecked == true)
+                // Registry
+                if (RegistryCleanupCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.ClearMRUListsAsync();
-                    tasks.Add("MRU lists");
+                    await RunTaskWithProgress("Cleaning registry run entries...", CleanerOperations.CleanRegistryAsync());
+                    tasks.Add("Registry run entries");
                 }
                 if (CleanFileExtensionAssociationsCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.CleanFileExtensionAssociationsAsync();
+                    await RunTaskWithProgress("Cleaning file associations...", CleanerOperations.CleanFileExtensionAssociationsAsync());
                     tasks.Add("File associations");
                 }
                 if (CleanUninstallEntriesCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.CleanUninstallEntriesAsync();
+                    await RunTaskWithProgress("Cleaning uninstall entries...", CleanerOperations.CleanUninstallEntriesAsync());
                     tasks.Add("Uninstall entries");
                 }
                 if (CleanSharedDLLsCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.CleanSharedDLLsAsync();
+                    await RunTaskWithProgress("Cleaning shared DLLs...", CleanerOperations.CleanSharedDLLsAsync());
                     tasks.Add("Shared DLLs");
                 }
                 if (CleanCOMRegistrationsCheckBox.IsChecked == true)
                 {
-                    await CleanerOperations.CleanCOMRegistrationsAsync();
+                    await RunTaskWithProgress("Cleaning COM registrations...", CleanerOperations.CleanCOMRegistrationsAsync());
                     tasks.Add("COM registrations");
+                }
+                if (ClearMUICacheCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Clearing MUI cache...", CleanerOperations.ClearMUICacheAsync());
+                    tasks.Add("MUI cache");
+                }
+
+                // Advanced
+                if (EmptyDirsCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Removing empty directories...", CleanerOperations.RemoveEmptyDirectoriesAsync());
+                    tasks.Add("Empty directories");
+                }
+                if (BrokenShortcutsCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Removing broken shortcuts...", CleanerOperations.RemoveBrokenShortcutsAsync());
+                    tasks.Add("Broken shortcuts");
+                }
+                if (RemoveWindowsOldCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Removing Windows.old...", CleanerOperations.RemoveWindowsOldAsync());
+                    tasks.Add("Windows.old");
+                }
+                if (CleanDriverStoreCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Cleaning driver store...", CleanerOperations.CleanDriverStoreAsync());
+                    tasks.Add("Driver store");
+                }
+                if (CleanWindowsInstallerCacheCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Cleaning installer cache...", CleanerOperations.CleanWindowsInstallerCacheAsync());
+                    tasks.Add("Installer cache");
+                }
+                if (DisableHibernationCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Disabling hibernation...", CleanerOperations.DisableHibernationAsync());
+                    tasks.Add("Hibernation");
+                }
+                if (CleanSystemRestorePointsCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Cleaning restore points...", CleanerOperations.CleanSystemRestorePointsAsync());
+                    tasks.Add("Restore points");
+                }
+                if (RebuildSearchIndexCheckBox.IsChecked == true)
+                {
+                    await RunTaskWithProgress("Rebuilding search index...", CleanerOperations.RebuildSearchIndexAsync());
+                    tasks.Add("Search index");
                 }
 
                 long freeAfter = new DriveInfo(systemDrive).AvailableFreeSpace;
@@ -448,118 +419,123 @@ namespace SystemCleaner
                     $"Space reclaimed: {FormatBytes(reclaimed)}"
                 };
 
-                MessageBox.Show(string.Join(Environment.NewLine, reportLines), "Cleaning complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                CustomDialog.Show(string.Join(Environment.NewLine, reportLines), "Cleaning complete", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomDialog.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
+                ShowProgress(false);
                 DisableActionButtons(false);
             }
         }
 
+        private async Task RunTaskWithProgress(string taskName, Task task)
+        {
+            UpdateProgress(taskName);
+            await task;
+            _completedTasks++;
+            UpdateProgressBar();
+        }
+
+        private void UpdateProgress(string taskName)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ProgressTextBlock.Text = taskName;
+            });
+        }
+
+        private void UpdateProgressBar()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                double percentage = (_completedTasks / (double)_totalTasks) * 100;
+                CleaningProgressBar.Value = percentage;
+            });
+        }
+
+        private void ShowProgress(bool show)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ProgressPanel.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+                if (!show)
+                {
+                    CleaningProgressBar.Value = 0;
+                    ProgressTextBlock.Text = "Initializing...";
+                }
+            });
+        }
+
+        private int CountSelectedTasks()
+        {
+            int count = 0;
+            
+            // Quick Cleanup
+            if (JunkFilesCheckBox.IsChecked == true) count++;
+            if (SystemTempCheckBox.IsChecked == true) count++;
+            if (RecycleBinCheckBox.IsChecked == true) count++;
+            if (BrowserDataCheckBox.IsChecked == true) count++;
+            if (FileHistoryCheckBox.IsChecked == true) count++;
+
+            // Privacy & Tracking
+            if (WindowsDefenderCheckBox.IsChecked == true) count++;
+            if (ClearUserAssistDataCheckBox.IsChecked == true) count++;
+            if (ClearTypedPathsCheckBox.IsChecked == true) count++;
+            if (ClearRecentAppsCheckBox.IsChecked == true) count++;
+            if (ClearClipboardHistoryCheckBox.IsChecked == true) count++;
+            if (ClearMRUListsCheckBox.IsChecked == true) count++;
+
+            // System Maintenance
+            if (VisualCacheCheckBox.IsChecked == true) count++;
+            if (ClearFontCacheCheckBox.IsChecked == true) count++;
+            if (ClearWindowsStoreCacheCheckBox.IsChecked == true) count++;
+            if (ComponentStoreCheckBox.IsChecked == true) count++;
+            if (CleanWindowsUpdateCheckBox.IsChecked == true) count++;
+
+            // Logs & Diagnostics
+            if (DiagnosticsCheckBox.IsChecked == true) count++;
+            if (ClearEventLogsCheckBox.IsChecked == true) count++;
+            if (ClearWindowsSetupLogsCheckBox.IsChecked == true) count++;
+            if (ClearCrashDumpsCheckBox.IsChecked == true) count++;
+            if (ClearPerformanceMonitorDataCheckBox.IsChecked == true) count++;
+            if (ClearCBSLogsCheckBox.IsChecked == true) count++;
+
+            // Network
+            if (FlushDNSCacheCheckBox.IsChecked == true) count++;
+            if (ClearNetBIOSCacheCheckBox.IsChecked == true) count++;
+            if (ClearARPCacheCheckBox.IsChecked == true) count++;
+            if (ClearWindowsNetworkingCacheCheckBox.IsChecked == true) count++;
+            if (ClearNetworkLocationCacheCheckBox.IsChecked == true) count++;
+            if (ClearBITSQueueCheckBox.IsChecked == true) count++;
+
+            // Registry
+            if (RegistryCleanupCheckBox.IsChecked == true) count++;
+            if (CleanFileExtensionAssociationsCheckBox.IsChecked == true) count++;
+            if (CleanUninstallEntriesCheckBox.IsChecked == true) count++;
+            if (CleanSharedDLLsCheckBox.IsChecked == true) count++;
+            if (CleanCOMRegistrationsCheckBox.IsChecked == true) count++;
+            if (ClearMUICacheCheckBox.IsChecked == true) count++;
+
+            // Advanced
+            if (EmptyDirsCheckBox.IsChecked == true) count++;
+            if (BrokenShortcutsCheckBox.IsChecked == true) count++;
+            if (RemoveWindowsOldCheckBox.IsChecked == true) count++;
+            if (CleanDriverStoreCheckBox.IsChecked == true) count++;
+            if (CleanWindowsInstallerCacheCheckBox.IsChecked == true) count++;
+            if (DisableHibernationCheckBox.IsChecked == true) count++;
+            if (CleanSystemRestorePointsCheckBox.IsChecked == true) count++;
+            if (RebuildSearchIndexCheckBox.IsChecked == true) count++;
+
+            return count;
+        }
+
         private bool HasAnySelections()
         {
-            return JunkFilesCheckBox.IsChecked == true ||
-                   SystemTempCheckBox.IsChecked == true ||
-                   RecycleBinCheckBox.IsChecked == true ||
-                   DiagnosticsCheckBox.IsChecked == true ||
-                   VisualCacheCheckBox.IsChecked == true ||
-                   FileHistoryCheckBox.IsChecked == true ||
-                   BrowserDataCheckBox.IsChecked == true ||
-                   WindowsDefenderCheckBox.IsChecked == true ||
-                   RegistryCleanupCheckBox.IsChecked == true ||
-                   ComponentStoreCheckBox.IsChecked == true ||
-                   EmptyDirsCheckBox.IsChecked == true ||
-                   BrokenShortcutsCheckBox.IsChecked == true ||
-                   ClearFontCacheCheckBox.IsChecked == true ||
-                   ClearWindowsStoreCacheCheckBox.IsChecked == true ||
-                   CleanWindowsUpdateCheckBox.IsChecked == true ||
-                   ClearNetworkLocationCacheCheckBox.IsChecked == true ||
-                   ClearBITSQueueCheckBox.IsChecked == true ||
-                   ClearCBSLogsCheckBox.IsChecked == true ||
-                   ClearEventLogsCheckBox.IsChecked == true ||
-                   ClearWindowsSetupLogsCheckBox.IsChecked == true ||
-                   ClearCrashDumpsCheckBox.IsChecked == true ||
-                   ClearPerformanceMonitorDataCheckBox.IsChecked == true ||
-                   ClearClipboardHistoryCheckBox.IsChecked == true ||
-                   RebuildSearchIndexCheckBox.IsChecked == true ||
-                   ClearUserAssistDataCheckBox.IsChecked == true ||
-                   ClearTypedPathsCheckBox.IsChecked == true ||
-                   ClearMUICacheCheckBox.IsChecked == true ||
-                   ClearRecentAppsCheckBox.IsChecked == true ||
-                   FlushDNSCacheCheckBox.IsChecked == true ||
-                   ClearNetBIOSCacheCheckBox.IsChecked == true ||
-                   ClearARPCacheCheckBox.IsChecked == true ||
-                   ClearWindowsNetworkingCacheCheckBox.IsChecked == true ||
-                   RemoveWindowsOldCheckBox.IsChecked == true ||
-                   CleanDriverStoreCheckBox.IsChecked == true ||
-                   CleanWindowsInstallerCacheCheckBox.IsChecked == true ||
-                   DisableHibernationCheckBox.IsChecked == true ||
-                   CleanSystemRestorePointsCheckBox.IsChecked == true ||
-                   ClearMRUListsCheckBox.IsChecked == true ||
-                   CleanFileExtensionAssociationsCheckBox.IsChecked == true ||
-                   CleanUninstallEntriesCheckBox.IsChecked == true ||
-                   CleanSharedDLLsCheckBox.IsChecked == true ||
-                   CleanCOMRegistrationsCheckBox.IsChecked == true;
-        }
-
-        private bool NeedsElevation()
-        {
-            return SystemTempCheckBox.IsChecked == true ||
-                   RecycleBinCheckBox.IsChecked == true ||
-                   WindowsDefenderCheckBox.IsChecked == true ||
-                   ComponentStoreCheckBox.IsChecked == true ||
-                   RegistryCleanupCheckBox.IsChecked == true ||
-                   ClearFontCacheCheckBox.IsChecked == true ||
-                   CleanWindowsUpdateCheckBox.IsChecked == true ||
-                   ClearNetworkLocationCacheCheckBox.IsChecked == true ||
-                   ClearEventLogsCheckBox.IsChecked == true ||
-                   ClearWindowsSetupLogsCheckBox.IsChecked == true ||
-                   ClearCrashDumpsCheckBox.IsChecked == true ||
-                   RebuildSearchIndexCheckBox.IsChecked == true ||
-                   RemoveWindowsOldCheckBox.IsChecked == true ||
-                   CleanDriverStoreCheckBox.IsChecked == true ||
-                   CleanWindowsInstallerCacheCheckBox.IsChecked == true ||
-                   DisableHibernationCheckBox.IsChecked == true ||
-                   CleanSystemRestorePointsCheckBox.IsChecked == true ||
-                   CleanUninstallEntriesCheckBox.IsChecked == true ||
-                   CleanSharedDLLsCheckBox.IsChecked == true ||
-                   CleanCOMRegistrationsCheckBox.IsChecked == true;
-        }
-
-        private static bool IsRunningAsAdmin()
-        {
-            try
-            {
-                using WindowsIdentity identity = WindowsIdentity.GetCurrent();
-                var principal = new WindowsPrincipal(identity);
-                return principal.IsInRole(WindowsBuiltInRole.Administrator);
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private void RestartElevated()
-        {
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = Environment.ProcessPath ?? "SystemCleaner.exe",
-                    UseShellExecute = true,
-                    Verb = "runas"
-                };
-                Process.Start(psi);
-            }
-            catch
-            {
-                // ignore failures
-            }
+            return CountSelectedTasks() > 0;
         }
 
         private void EnsureProcessesClosed(bool browsersSelected)
@@ -579,7 +555,7 @@ namespace SystemCleaner
             if (!running.Any()) return;
 
             var list = string.Join(", ", running.Select(p => p.ProcessName).Distinct());
-            var close = MessageBox.Show(
+            var close = CustomDialog.Show(
                 $"These apps are running and may lock files: {list}\n\nClose them now?",
                 "Close apps",
                 MessageBoxButton.YesNo,

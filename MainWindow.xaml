@@ -16,6 +16,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,20">
@@ -38,121 +39,119 @@
                       HorizontalScrollBarVisibility="Disabled"
                       Padding="0,0,12,0">
             <StackPanel>
-                <!-- Storage -->
+                <!-- Quick Cleanup -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="Storage" Style="{StaticResource HeaderTextStyle}" />
+                        <TextBlock Text="Quick Cleanup" Style="{StaticResource HeaderTextStyle}" />
                         <CheckBox x:Name="JunkFilesCheckBox" Content="Remove user temporary files" />
-                        <CheckBox x:Name="SystemTempCheckBox" Content="Remove system temp and update caches" />
+                        <CheckBox x:Name="SystemTempCheckBox" Content="Remove system temporary and update caches" />
                         <CheckBox x:Name="RecycleBinCheckBox" Content="Empty recycle bin (C:)" />
-                        <CheckBox x:Name="DiagnosticsCheckBox" Content="Remove diagnostics and error reports" />
-                        <CheckBox x:Name="VisualCacheCheckBox" Content="Clear icon and thumbnail caches" Margin="0,0,0,0" />
-                    </StackPanel>
-                </Border>
-
-                <!-- History and Privacy -->
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
-                    <StackPanel>
-                        <TextBlock Text="History and Privacy" Style="{StaticResource HeaderTextStyle}" />
-                        <CheckBox x:Name="FileHistoryCheckBox" Content="Clear recent documents and Explorer history" />
                         <CheckBox x:Name="BrowserDataCheckBox" Content="Wipe browser history and cache (all browsers)" />
-                        <CheckBox x:Name="WindowsDefenderCheckBox" Content="Clear Windows Defender logs and history" Margin="0,0,0,0" />
+                        <CheckBox x:Name="FileHistoryCheckBox" Content="Clear recent documents and Explorer history" Margin="0,0,0,0" />
                     </StackPanel>
                 </Border>
 
-                <!-- System -->
+                <!-- Privacy & Tracking -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="System" Style="{StaticResource HeaderTextStyle}" />
-                        <CheckBox x:Name="RegistryCleanupCheckBox" Content="Clean obsolete registry run entries" />
-                        <CheckBox x:Name="ComponentStoreCheckBox" Content="Clean Windows component store (DISM)" Margin="0,0,0,0" />
+                        <TextBlock Text="Privacy and Tracking" Style="{StaticResource HeaderTextStyle}" />
+                        <CheckBox x:Name="WindowsDefenderCheckBox" Content="Clear Windows Defender logs and history" />
+                        <CheckBox x:Name="ClearUserAssistDataCheckBox" Content="Clear UserAssist (program usage tracking)" />
+                        <CheckBox x:Name="ClearTypedPathsCheckBox" Content="Clear Explorer typed paths history" />
+                        <CheckBox x:Name="ClearRecentAppsCheckBox" Content="Clear recent applications from Start Menu" />
+                        <CheckBox x:Name="ClearClipboardHistoryCheckBox" Content="Clear clipboard history (Win10/11)" />
+                        <CheckBox x:Name="ClearMRUListsCheckBox" Content="Clear Most Recently Used (MRU) lists" Margin="0,0,0,0" />
                     </StackPanel>
                 </Border>
 
-                <!-- Clutter -->
+                <!-- System Maintenance -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="Clutter" Style="{StaticResource HeaderTextStyle}" />
-                        <CheckBox x:Name="EmptyDirsCheckBox" Content="Remove empty directories" />
-                        <CheckBox x:Name="BrokenShortcutsCheckBox" Content="Remove broken shortcuts" Margin="0,0,0,0" />
-                    </StackPanel>
-                </Border>
-
-                <!-- Windows System Cache -->
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
-                    <StackPanel>
-                        <TextBlock Text="Windows System Cache" Style="{StaticResource HeaderTextStyle}" />
+                        <TextBlock Text="System Maintenance" Style="{StaticResource HeaderTextStyle}" />
+                        <CheckBox x:Name="VisualCacheCheckBox" Content="Clear icon and thumbnail caches" />
                         <CheckBox x:Name="ClearFontCacheCheckBox" Content="Clear font cache" />
                         <CheckBox x:Name="ClearWindowsStoreCacheCheckBox" Content="Clear Microsoft Store cache" />
-                        <CheckBox x:Name="CleanWindowsUpdateCheckBox" Content="Clean superseded Windows Updates" />
-                        <CheckBox x:Name="ClearNetworkLocationCacheCheckBox" Content="Clear network location awareness cache" />
-                        <CheckBox x:Name="ClearBITSQueueCheckBox" Content="Clear BITS transfer queue" />
+                        <CheckBox x:Name="ComponentStoreCheckBox" Content="Clean Windows component store (DISM)" />
+                        <CheckBox x:Name="CleanWindowsUpdateCheckBox" Content="Clean superseded Windows Updates" Margin="0,0,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Logs & Diagnostics -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="Logs and Diagnostics" Style="{StaticResource HeaderTextStyle}" />
+                        <CheckBox x:Name="DiagnosticsCheckBox" Content="Remove diagnostics and error reports" />
+                        <CheckBox x:Name="ClearEventLogsCheckBox" Content="Clear Windows Event Logs (Application/System/Security)" />
+                        <CheckBox x:Name="ClearWindowsSetupLogsCheckBox" Content="Clear Windows Setup logs" />
+                        <CheckBox x:Name="ClearCrashDumpsCheckBox" Content="Clear crash dumps and memory dumps" />
+                        <CheckBox x:Name="ClearPerformanceMonitorDataCheckBox" Content="Clear Performance Monitor data" />
                         <CheckBox x:Name="ClearCBSLogsCheckBox" Content="Clear Component-Based Servicing logs" Margin="0,0,0,0" />
                     </StackPanel>
                 </Border>
 
-                <!-- Event & Diagnostic Logs -->
+                <!-- Network -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="Event and Diagnostic Logs" Style="{StaticResource HeaderTextStyle}" />
-                        <CheckBox x:Name="ClearEventLogsCheckBox" Content="Clear Windows Event Logs (Application/System/Security)" />
-                        <CheckBox x:Name="ClearWindowsSetupLogsCheckBox" Content="Clear Windows Setup logs" />
-                        <CheckBox x:Name="ClearCrashDumpsCheckBox" Content="Clear crash dumps and memory dumps" />
-                        <CheckBox x:Name="ClearPerformanceMonitorDataCheckBox" Content="Clear Performance Monitor data" Margin="0,0,0,0" />
-                    </StackPanel>
-                </Border>
-
-                <!-- User Profile Cleanup -->
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
-                    <StackPanel>
-                        <TextBlock Text="User Profile Cleanup" Style="{StaticResource HeaderTextStyle}" />
-                        <CheckBox x:Name="ClearClipboardHistoryCheckBox" Content="Clear clipboard history (Win10/11)" />
-                        <CheckBox x:Name="RebuildSearchIndexCheckBox" Content="Rebuild Windows Search index" />
-                        <CheckBox x:Name="ClearUserAssistDataCheckBox" Content="Clear UserAssist (program usage tracking)" />
-                        <CheckBox x:Name="ClearTypedPathsCheckBox" Content="Clear Explorer typed paths history" />
-                        <CheckBox x:Name="ClearMUICacheCheckBox" Content="Clear MUI cache (file type associations)" />
-                        <CheckBox x:Name="ClearRecentAppsCheckBox" Content="Clear recent applications from Start Menu" Margin="0,0,0,0" />
-                    </StackPanel>
-                </Border>
-
-                <!-- Network Cache -->
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
-                    <StackPanel>
-                        <TextBlock Text="Network Cache" Style="{StaticResource HeaderTextStyle}" />
+                        <TextBlock Text="Network" Style="{StaticResource HeaderTextStyle}" />
                         <CheckBox x:Name="FlushDNSCacheCheckBox" Content="Flush DNS resolver cache" />
                         <CheckBox x:Name="ClearNetBIOSCacheCheckBox" Content="Clear NetBIOS name cache" />
                         <CheckBox x:Name="ClearARPCacheCheckBox" Content="Clear ARP (Address Resolution Protocol) cache" />
-                        <CheckBox x:Name="ClearWindowsNetworkingCacheCheckBox" Content="Clear Windows networking cache (SMB/offline files)" Margin="0,0,0,0" />
+                        <CheckBox x:Name="ClearWindowsNetworkingCacheCheckBox" Content="Clear Windows networking cache (SMB/offline files)" />
+                        <CheckBox x:Name="ClearNetworkLocationCacheCheckBox" Content="Clear network location awareness cache" />
+                        <CheckBox x:Name="ClearBITSQueueCheckBox" Content="Clear BITS transfer queue" Margin="0,0,0,0" />
                     </StackPanel>
                 </Border>
 
-                <!-- Large System Files -->
+                <!-- Registry -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
                     <StackPanel>
-                        <TextBlock Text="Large System Files (Advanced)" Style="{StaticResource HeaderTextStyle}" />
+                        <TextBlock Text="Registry" Style="{StaticResource HeaderTextStyle}" />
+                        <CheckBox x:Name="RegistryCleanupCheckBox" Content="Clean obsolete registry run entries" />
+                        <CheckBox x:Name="CleanFileExtensionAssociationsCheckBox" Content="Clean invalid file extension associations" />
+                        <CheckBox x:Name="CleanUninstallEntriesCheckBox" Content="Remove invalid uninstaller entries" />
+                        <CheckBox x:Name="CleanSharedDLLsCheckBox" Content="Clean orphaned shared DLL references" />
+                        <CheckBox x:Name="CleanCOMRegistrationsCheckBox" Content="Remove invalid COM/DCOM registrations" />
+                        <CheckBox x:Name="ClearMUICacheCheckBox" Content="Clear MUI cache (file type associations)" Margin="0,0,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Advanced -->
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Advanced (Use with Caution)" Style="{StaticResource HeaderTextStyle}" />
+                        <CheckBox x:Name="EmptyDirsCheckBox" Content="Remove empty directories" />
+                        <CheckBox x:Name="BrokenShortcutsCheckBox" Content="Remove broken shortcuts" />
                         <CheckBox x:Name="RemoveWindowsOldCheckBox" Content="Remove Windows.old folder (old Windows installation)" />
                         <CheckBox x:Name="CleanDriverStoreCheckBox" Content="Clean old driver packages from driver store" />
                         <CheckBox x:Name="CleanWindowsInstallerCacheCheckBox" Content="Clean Windows Installer cache (orphaned MSI files)" />
                         <CheckBox x:Name="DisableHibernationCheckBox" Content="Disable hibernation (deletes hiberfil.sys)" />
-                        <CheckBox x:Name="CleanSystemRestorePointsCheckBox" Content="Delete old System Restore points (keep most recent)" Margin="0,0,0,0" />
-                    </StackPanel>
-                </Border>
-
-                <!-- Registry Optimization -->
-                <Border Style="{StaticResource CardStyle}">
-                    <StackPanel>
-                        <TextBlock Text="Registry Optimization" Style="{StaticResource HeaderTextStyle}" />
-                        <CheckBox x:Name="ClearMRUListsCheckBox" Content="Clear Most Recently Used (MRU) lists" />
-                        <CheckBox x:Name="CleanFileExtensionAssociationsCheckBox" Content="Clean invalid file extension associations" />
-                        <CheckBox x:Name="CleanUninstallEntriesCheckBox" Content="Remove invalid uninstaller entries" />
-                        <CheckBox x:Name="CleanSharedDLLsCheckBox" Content="Clean orphaned shared DLL references" />
-                        <CheckBox x:Name="CleanCOMRegistrationsCheckBox" Content="Remove invalid COM/DCOM registrations" Margin="0,0,0,0" />
+                        <CheckBox x:Name="CleanSystemRestorePointsCheckBox" Content="Delete old System Restore points (keep most recent)" />
+                        <CheckBox x:Name="RebuildSearchIndexCheckBox" Content="Rebuild Windows Search index" Margin="0,0,0,0" />
                     </StackPanel>
                 </Border>
             </StackPanel>
         </ScrollViewer>
 
-        <Grid Grid.Row="2" Margin="0,20,0,0">
+        <!-- Progress Bar -->
+        <Border Grid.Row="2" 
+                x:Name="ProgressPanel"
+                Style="{StaticResource CardStyle}"
+                Margin="0,20,0,0"
+                Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock x:Name="ProgressTextBlock"
+                           Text="Initializing..."
+                           FontSize="13"
+                           Margin="0,0,0,8" />
+                <ProgressBar x:Name="CleaningProgressBar"
+                             Height="8"
+                             Minimum="0"
+                             Maximum="100"
+                             Value="0" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="3" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
