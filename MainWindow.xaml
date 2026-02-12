@@ -44,9 +44,9 @@
                     <StackPanel>
                         <TextBlock Text="Quick Cleanup" Style="{StaticResource HeaderTextStyle}" />
                         <CheckBox x:Name="JunkFilesCheckBox" Content="Remove user temporary files" />
-                        <CheckBox x:Name="SystemTempCheckBox" Content="Remove system temporary and update caches" />
+                        <CheckBox x:Name="SystemTempCheckBox" Content="Remove system temporary files and update caches" />
                         <CheckBox x:Name="RecycleBinCheckBox" Content="Empty recycle bin (C:)" />
-                        <CheckBox x:Name="BrowserDataCheckBox" Content="Wipe browser history and cache (all browsers)" />
+                        <CheckBox x:Name="BrowserDataCheckBox" Content="Wipe all browsers' history and cache" />
                         <CheckBox x:Name="FileHistoryCheckBox" Content="Clear recent documents and Explorer history" Margin="0,0,0,0" />
                     </StackPanel>
                 </Border>
