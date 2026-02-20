@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCleaner", "SystemCleaner.csproj", "{762780C8-FC75-0046-5B2A-ACBF6A765A2D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{762780C8-FC75-0046-5B2A-ACBF6A765A2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{762780C8-FC75-0046-5B2A-ACBF6A765A2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{762780C8-FC75-0046-5B2A-ACBF6A765A2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{762780C8-FC75-0046-5B2A-ACBF6A765A2D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {346AC609-A440-48AA-9AE6-E3C7C199F78B}
+	EndGlobalSection
+EndGlobal
